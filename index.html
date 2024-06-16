@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Coin Game</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #coin { font-size: 5em; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Click the Coin!</h1>
+    <div id="coin">🪙</div>
+    <p>Clicks: <span id="clicks">0</span></p>
+    <script>
+        let clicks = 0;
+        let userId = "test_user"; // Use dynamic user ID in production
+
+        document.getElementById('coin').addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            let touchCount = event.touches.length;
+            clicks += touchCount;
+            document.getElementById('clicks').innerText = clicks;
+            fetch(`http://localhost:5000/update-score?user_id=${userId}&clicks=${clicks}`);
+        }, { passive: false });
+
+        document.getElementById('coin').addEventListener('click', (event) => {
+            clicks++;
+            document.getElementById('clicks').innerText = clicks;
+            fetch(`http://localhost:5000/update-score?user_id=${userId}&clicks=${clicks}`);
+        });
+
+        // Fetch initial score
+        fetch(`http://localhost:5000/get-score?user_id=${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                clicks = data.score || 0;
+                document.getElementById('clicks').innerText = clicks;
+            });
+    </script>
+</body>
+</html>
